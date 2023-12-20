@@ -21,6 +21,7 @@ class Task:
 
         self.time = end - start
         logging.debug("Task ended in " + str(self.time))
+        return self.x
 
 
 if __name__ == "__main__":

@@ -1,5 +1,3 @@
-import time
-
 from manager import QueueClient
 
 
@@ -10,20 +8,16 @@ class Minion(QueueClient):
 
     def run(self):
         while 1:
-            time.sleep(2)
             is_queue_empty = self.task_queue.empty()
             if not is_queue_empty:
-                print("Task found")
                 self._exec_task()
-            else:
-                print("Queue is empty")
 
     def _exec_task(self):
         self.current_task = self.task_queue.get()
-        # self.current_task.work()
-        time.sleep(0.5)
-
-        self.result_queue.put("123")
+        print("Beginning executing task " + str(self.current_task.identifier))
+        res = self.current_task.work()
+        print("Task finished!")
+        self.result_queue.put(res)
 
 
 if __name__ == "__main__":

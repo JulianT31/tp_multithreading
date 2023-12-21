@@ -26,7 +26,7 @@ class Boss(QueueClient):
                 print(self.result_queue.get())
 
     def _add_task(self):
-        task = Task(6000)
+        task = Task(3000)
         self.task_queue.put(task)
         print("Task '" + str(task.identifier) + "' added!")
 

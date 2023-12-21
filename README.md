@@ -52,7 +52,7 @@ Voici un tableau comparatif des différents tests réalisés.
 | Taille             |                3000                |
 | :----------------- | :--------------------------------: |
 | Python             | Task ended in en 0.3022408 seconds |
-| C++ (Pivot)        |  Task ended in en 10.0547 seconds  |
+| C++ (Piv)        |  Task ended in en 10.0547 seconds  |
 | C++ (Lu) 1 thread  |  Task ended in en 1.34219 seconds  |
 | C++ (Lu) 2 threads | Task ended in en 0.884321 seconds  |
 | C++ (Lu) 4 threads | Task ended in en 0.627631 seconds  |

@@ -1,4 +1,5 @@
 #include <cpr/cpr.h>
+#include <unistd.h>
 
 #include <Eigen/Dense>
 #include <chrono>
@@ -13,7 +14,6 @@ using json = nlohmann::json;
 //
 // Created by trani on 20/12/2023.
 //
-
 #ifndef TASK_H
 #define TASK_H
 
@@ -25,6 +25,7 @@ class Task {
   VectorXd b;
   VectorXd x;
   float time;
+
   Task(string identifier, int size, MatrixXd a, VectorXd b, VectorXd x,
        float time)
       : identifier(identifier), size(size), a(a), b(b), x(x), time(time){};
@@ -83,7 +84,7 @@ class Task {
 
 #endif
 
-Task* create_task_from_json(string text) {
+Task *create_task_from_json(string text) {
   json json_text = nlohmann::json::parse(text);
 
   int size = json_text["size"];
@@ -100,40 +101,45 @@ Task* create_task_from_json(string text) {
     b(i) = json_text["b"][i];
   }
 
-  Task* ma_task = new Task(identifier, size, a, b, x, time);
+  Task *ma_task = new Task(identifier, size, a, b, x, time);
 
   return ma_task;
 };
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   Eigen::setNbThreads(4);
-  cout << "----Start get from http://localhost:8000/ -----" << endl;
-  cpr::Response r = cpr::Get(cpr::Url{"http://localhost:8000/"});
-  r.status_code;             // 200
-  r.header["content-type"];  // application/json; charset=utf-8
-  r.text;
-  cout << "----End get from http://localhost:8000/ -----" << endl;
 
-  if (r.status_code != 200) {
-    cout << "Erreur " << r.status_code << endl;
-    return -1;
+  while (1) {
+    cout << "---- Start get from http://localhost:8000/ -----" << endl;
+    cpr::Response r = cpr::Get(cpr::Url{"http://localhost:8000/"});
+    r.status_code;             // 200
+    r.header["content-type"];  // application/json; charset=utf-8
+    r.text;
+    cout << "---- End get from http://localhost:8000/ -------" << endl;
+
+    if (r.status_code != 0) {
+      cout << "No task found, sleeping..." << r.status_code << endl;
+      usleep(1000000);
+    } else if (r.status_code != 2000) {
+      cout << "Proxy is not launched! Stoping the program" << endl;
+      return -1;
+    } else {
+      std::string text = r.text;
+
+      cout << "---- Task creation -----" << endl;
+      Task *task = create_task_from_json(text);
+      // cout << task->to_string() <<endl;
+      cout << "------------------------" << endl;
+
+      cout << "---- Task execution ----" << endl;
+      task->work();
+      cout << "------------------------" << endl;
+
+      cout << "---- Posting task result -----" << endl;
+      cpr::Response r_post = cpr::Post(cpr::Url{"http://localhost:8000/"},
+                                       cpr::Body{task->toJSONString()});
+      cout << "------------------------------" << endl;
+    }
   }
-
-  cout << "----Test affichage du text Json recolte -----" << endl;
-  std::string text = r.text;
-  // cout << text <<endl;
-  cout << "------------------------------------" << endl;
-
-  cout << "----Test creation de task -----" << endl;
-  Task* task = create_task_from_json(text);
-  // cout << task->to_string() <<endl;
-  cout << "------------------------------------" << endl;
-
-  cout << "----Test execution task -----" << endl;
-  task->work();
-  cout << "------------------------------------" << endl;
-
-  cpr::Response r_post = cpr::Post(cpr::Url{"http://localhost:8000/"},
-                                   cpr::Body{task->toJSONString()});
   return 0;
 }

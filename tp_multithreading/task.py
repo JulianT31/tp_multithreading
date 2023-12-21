@@ -37,6 +37,9 @@ class Task:
         json_string = json.dumps(dictionnary)
         return json_string
 
+    def __str__(self) -> str:
+        return f"Task(identifier={self.identifier}, size={self.size}, time={self.time})"
+
     @staticmethod
     def from_json(txt):
         dict_data = json.loads(txt)

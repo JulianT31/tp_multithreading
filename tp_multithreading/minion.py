@@ -15,9 +15,9 @@ class Minion(QueueClient):
     def _exec_task(self):
         self.current_task = self.task_queue.get()
         print("Beginning executing task " + str(self.current_task.identifier))
-        res = self.current_task.work()
+        self.current_task.work()
         print("Task finished!")
-        self.result_queue.put(res)
+        self.result_queue.put(self.current_task)
 
 
 if __name__ == "__main__":

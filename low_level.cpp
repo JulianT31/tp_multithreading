@@ -31,16 +31,42 @@ class Task {
 
   Eigen::VectorXd work() {
     auto start = std::chrono::high_resolution_clock::now();
-    this->x = a.colPivHouseholderQr().solve(b);
+    // this->x = a.colPivHouseholderQr().solve(b);
+    this->x = a.lu().solve(b);
     auto end = std::chrono::high_resolution_clock::now();
 
-    this->time =
-        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+    auto time_ellapsed =
+        std::chrono::duration_cast<std::chrono::duration<double>>(end - start)
             .count();
-    std::cout << "Task ended in " << time << " milliseconds" << std::endl;
+    this->time = time_ellapsed;
+
+    std::cout << "Task ended in " << time_ellapsed << " seconds" << std::endl;
 
     return this->x;
   };
+
+  string toJSONString() const {
+    nlohmann::json j;
+    j["identifier"] = identifier;
+    j["size"] = size;
+
+    // Convert Eigen matrix to JSON
+    std::vector<std::vector<double>> a_vector;
+    for (int i = 0; i < a.rows(); ++i) {
+      a_vector.push_back(std::vector<double>(
+          a.row(i).data(), a.row(i).data() + a.row(i).size()));
+    }
+    j["a"] = a_vector;
+
+    // Convert Eigen vectors to JSON
+    j["b"] = std::vector<double>(b.data(), b.data() + b.size());
+    j["x"] = std::vector<double>(x.data(), x.data() + x.size());
+
+    j["time"] = time;
+
+    // Use dump to convert JSON to string
+    return j.dump();
+  }
 
   std::string to_string() const {
     std::ostringstream oss;
@@ -80,6 +106,7 @@ Task* create_task_from_json(string text) {
 };
 
 int main(int argc, char** argv) {
+  Eigen::setNbThreads(4);
   cout << "----Start get from http://localhost:8000/ -----" << endl;
   cpr::Response r = cpr::Get(cpr::Url{"http://localhost:8000/"});
   r.status_code;             // 200
@@ -94,17 +121,19 @@ int main(int argc, char** argv) {
 
   cout << "----Test affichage du text Json recolte -----" << endl;
   std::string text = r.text;
-  /* cout << text <<endl; */
+  // cout << text <<endl;
   cout << "------------------------------------" << endl;
 
   cout << "----Test creation de task -----" << endl;
   Task* task = create_task_from_json(text);
-  /* cout << task->to_string() <<endl; */
+  // cout << task->to_string() <<endl;
   cout << "------------------------------------" << endl;
 
   cout << "----Test execution task -----" << endl;
   task->work();
   cout << "------------------------------------" << endl;
 
+  cpr::Response r_post = cpr::Post(cpr::Url{"http://localhost:8000/"},
+                                   cpr::Body{task->toJSONString()});
   return 0;
 }

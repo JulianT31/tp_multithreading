@@ -6,6 +6,8 @@ Ce dépôt est un projet scolaire inscrit dans le module de multithreading de la
 
 Les auteurs de ce projet sont Julian TRANI & Pauline JOBERT.
 
+**DISCLAIMER** : Ce projet a été réalisé sous Windows, les commandes pour le C++ n'ont pas été testées.
+
 ## Fonctionnement
 
 ### Partie Python
@@ -13,6 +15,8 @@ Les auteurs de ce projet sont Julian TRANI & Pauline JOBERT.
 Pour lancer la partie Python, vous devez exécuter le fichier `manager.py`, le fichier `proxy.py`, puis `boss.py` et `minion.py` si vous souhaitez que la tâche soit exécutée en Python ou C++.
 
 Dès son lancement, le fichier `boss.py` va ajouter 15 tâches dans la file d'attente.
+
+Quant au `minion`, il va récupérer une tâche dans la `queue` afin de l'exécuter, puis renvoyer le résultat dans une `queue`.
 
 Voici un exemple d'exécution :
 
@@ -22,7 +26,13 @@ Voici un exemple d'exécution :
 
 Vous pouvez lancer l'équivalent d'un minion Python, mais en C++, qui va vérifier de manière périodique si une tâche est disponible afin de la réaliser.
 
-Pour cela, assurez-vous que le `proxy` Python est lancé avant d'exécuter le code C++ avec les commandes suivantes :
+Pour cela, **assurez-vous que le `proxy` Python soit lancé** avant d'exécuter le code C++ avec les commandes suivantes :
+
+```
+cmake -B build -S .
+cmake --build build
+./build/low_level
+```
 
 Voici un exemple d'exécution du côté C++ :
 
@@ -37,7 +47,7 @@ Du côté du code Python, nous récupérons les informations sur l'exécution de
 ## Comparaison Python/C++
 
 Voici un tableau comparatif des différents tests réalisés.
-NB : En C++, les tests sont réalisés en mode `RELEASE` afin d'obtenir de meilleures performances.
+**NB :** En C++, les tests sont réalisés en mode `RELEASE` afin d'obtenir de meilleures performances.
 
 | Taille             |                3000                |
 | :----------------- | :--------------------------------: |

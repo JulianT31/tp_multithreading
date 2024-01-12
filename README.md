@@ -6,17 +6,24 @@ Ce dépôt est un projet scolaire inscrit dans le module de multithreading de la
 
 Les auteurs de ce projet sont Julian TRANI & Pauline JOBERT.
 
-**DISCLAIMER** : Ce projet a été réalisé sous Windows, les commandes pour le C++ n'ont pas été testées.
+**DISCLAIMER** : 
+- Ce projet a été réalisé sous Windows.
+- Les commandes pour executer la partie C++ n'ont pas été testées, étant donné que nous avons utilisé une extension de VSCode.
+- Nous avons implémenté des tests unitaires pour la partie Python mais pas la partie C++.
 
 ## Fonctionnement
 
 ### Partie Python
 
-Pour lancer la partie Python, vous devez exécuter le fichier `manager.py`, le fichier `proxy.py`, puis `boss.py` et `minion.py` si vous souhaitez que la tâche soit exécutée en Python ou C++.
+Pour lancer la partie Python, vous pouvez exécuter les fichiers dans l'ordre suivant :
+- `manager.py`
+- `proxy.py`
+- `boss.py`
+- `minion.py` 
 
-Dès son lancement, le fichier `boss.py` va ajouter 15 tâches dans la file d'attente.
+Dès son lancement, le fichier `boss.py` va ajouter 15 tâches dans la file d'attente (paramètre modifiable directement dans le code).
 
-Quant au `minion`, il va récupérer une tâche dans la `queue` afin de l'exécuter, puis renvoyer le résultat dans une `queue`.
+Quant au `minion`, il va récupérer une tâche dans la `task_queue` afin de l'exécuter, puis renvoyer le résultat dans une `result_queue`.
 
 Voici un exemple d'exécution :
 
@@ -24,7 +31,10 @@ Voici un exemple d'exécution :
 
 ### Partie C++
 
-Vous pouvez lancer l'équivalent d'un minion Python, mais en C++, qui va vérifier de manière périodique si une tâche est disponible afin de la réaliser.
+Le principe est de garder l'architecture logicielle Python, mais de ne pas réaliser la tâche avec un minion Python mais C++.
+On veut envoyer les informations de tâche à un minion C++ via une requête http `GET`.
+Le minion C++ vérifie de manière périodique si une tâche est disponible afin de la réaliser. 
+Si c'est le cas, il récupère les données, réalise la tâche, et renvoie le résultat via une nouvelle requête http `POST`.
 
 Pour cela, **assurez-vous que le `proxy` Python soit lancé** avant d'exécuter le code C++ avec les commandes suivantes :
 
@@ -46,6 +56,7 @@ Du côté du code Python, nous récupérons les informations sur l'exécution de
 
 ## Comparaison Python/C++
 
+L'objectif est de comparer la vitesse d'execution d'une tâche par un minion Python avec un minion C++.
 Voici un tableau comparatif des différents tests réalisés.
 **NB :** En C++, les tests sont réalisés en mode `RELEASE` afin d'obtenir de meilleures performances.
 
@@ -56,3 +67,6 @@ Voici un tableau comparatif des différents tests réalisés.
 | C++ (Lu) 1 thread  |  Task ended in en 1.34219 seconds  |
 | C++ (Lu) 2 threads | Task ended in en 0.884321 seconds  |
 | C++ (Lu) 4 threads | Task ended in en 0.627631 seconds  |
+
+On observe que le minion Python a une vitesse d'exécution plus rapide que le minion C++ grâce à NumPy.
+
